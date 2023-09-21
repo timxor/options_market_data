@@ -11,7 +11,7 @@ chardet==4.0.0
 charset-normalizer==2.0.9
 click==8.0.3
 cookiecutter==1.7.3
-cryptography==36.0.1
+cryptography==41.0.4
 cssselect==1.2.0
 discord-webhook==0.14.0
 distlib==0.3.4
