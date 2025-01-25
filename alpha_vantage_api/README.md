@@ -14,9 +14,13 @@ https://www.alphavantage.co/documentation/#historical-options
 
 #### 1. Most recent options data:
 
-```curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&apikey=YOUR_API_KEY"```
+```
+curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&apikey=YOUR_API_KEY"
+```
 
 https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&apikey=YOUR_API_KEY
+
+
 
 
 
@@ -32,14 +36,19 @@ https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&date=2
 
 #### 3. CSV format:
 
-```curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&date=2024-01-17&apikey=YOUR_API_KEY&datatype=csv" > pltr_options.csv```
+```
+curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&date=2024-01-17&apikey=YOUR_API_KEY&datatype=csv" > pltr_options.csv
+```
+
 
 https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&date=2024-01-17&apikey=YOUR_API_KEY&datatype=csv
 
 
 #### 4. JSON format:
 
-```curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&apikey=YOUR_API_KEY" | jq '.'```
+```
+curl "https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=PLTR&apikey=YOUR_API_KEY" | jq '.'
+```
 
 
 
