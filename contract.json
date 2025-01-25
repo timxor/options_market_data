@@ -1,0 +1,22 @@
+{
+  "contractID": "IBM250124C00120000",
+  "symbol": "IBM",
+  "expiration": "2025-01-24",
+  "strike": "120.00",
+  "type": "call",
+  "last": "0.00",
+  "mark": "104.88",
+  "bid": "104.15",
+  "bid_size": "72",
+  "ask": "105.60",
+  "ask_size": "73",
+  "volume": "0",
+  "open_interest": "0",
+  "date": "2025-01-24",
+  "implied_volatility": "4.67963",
+  "delta": "0.99638",
+  "gamma": "0.00020",
+  "theta": "-1.13997",
+  "vega": "0.00127",
+  "rho": "0.00326"
+}
