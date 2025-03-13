@@ -30,10 +30,15 @@ public class YahooFinanceOptionsChainScraper {
     private static final Logger LOGGER = Logger.getLogger(YahooFinanceOptionsChainScraper.class.getName());
 
     public static void main(String[] args) {
+
+        // options for Mar 21, 2025
+        // https://finance.yahoo.com/quote/PLTR/options/?date=1742515200
+
         String baseUrl = "https://finance.yahoo.com/quote/";
         String palantirTickerSymbol = "PLTR";
         String postfixUrl = "/options/";
-        String url = baseUrl + palantirTickerSymbol + postfixUrl;
+        String optionsDate = "?date=1742515200";
+        String url = baseUrl + palantirTickerSymbol + postfixUrl + optionsDate;
         String chromeDriverPath = "/usr/local/bin/chromedriver";
         String directoryPath = Paths.get(System.getProperty("user.dir"), "scraped_data").toString();
 

@@ -11,7 +11,9 @@ Clone, build, run:
 ```
 git clone https://github.com/timxor/options_market_data.git
 
-cd options_market_data/web-scraper
+cd options_market_data
+
+cd web-scraper
 
 
 # Clean the project (removes target directory)
