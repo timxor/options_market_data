@@ -2,6 +2,44 @@
 
 options_market_data
 
+
+## Quick Start
+
+Clone, build, run:
+
+
+```
+
+git clone https://github.com/timxor/options_market_data.git
+
+cd options_market_data/web-scraper
+
+
+# Clean the project (removes target directory)
+mvn clean
+
+
+# Compile the project
+mvn compile
+
+
+# Clean and Compile 
+mvn clean compile
+
+
+# Run the application using the exec plugin
+mvn exec:java
+
+
+# Clean, Compile and Run
+mvn clean compile exec:java
+
+```
+
+
+
+
+
 ## alpha vantage api examples
 
 alpha vantage api examples
@@ -29816,29 +29854,3 @@ https://www.alphavantage.co/query?function=HISTORICAL_OPTIONS&symbol=IBM&apikey=
 }
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
