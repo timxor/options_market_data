@@ -30,10 +30,6 @@ public class YahooFinanceOptionsChainScraper {
     private static final Logger LOGGER = Logger.getLogger(YahooFinanceOptionsChainScraper.class.getName());
 
     public static void main(String[] args) {
-
-        // options for Mar 21, 2025
-        // https://finance.yahoo.com/quote/PLTR/options/?date=1742515200
-
         String baseUrl = "https://finance.yahoo.com/quote/";
         String palantirTickerSymbol = "PLTR";
         String postfixUrl = "/options/";
@@ -42,87 +38,60 @@ public class YahooFinanceOptionsChainScraper {
         String chromeDriverPath = "/usr/local/bin/chromedriver";
         String directoryPath = Paths.get(System.getProperty("user.dir"), "scraped_data").toString();
 
-        WebDriver driver = null; // Declare outside try block for finally access
-
+        WebDriver driver = null;
 
         try {
-            // Configure logging
             LOGGER.setLevel(Level.INFO);
             LOGGER.info("Starting Yahoo Finance Options Chain Scraper");
-
-            // Create directory if it doesn't exist
             Files.createDirectories(Paths.get(directoryPath));
-
-            // Create filename with timestamp
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
             String timestamp = dateFormat.format(new Date());
             String csvFileName = "palantir_yahoo_options_chain_" + timestamp + ".csv";
             String csvFilePath = Paths.get(directoryPath, csvFileName).toString();
 
-            // Set up Selenium WebDriver with enhanced configuration
             System.setProperty("webdriver.chrome.driver", chromeDriverPath);
             ChromeOptions options = new ChromeOptions();
-            options.setExperimentalOption("detach", false);  // Ensures Chrome closes
-            options.addArguments("--headless"); // Run in headless mode (no GUI)
-            options.addArguments("--disable-gpu"); // Recommended for headless
-            options.addArguments("--no-sandbox"); // Bypass OS security model
-            options.addArguments("--disable-dev-shm-usage"); // Overcome limited resource problems
-            options.addArguments("--window-size=1920,1080"); // Set window size
-            options.addArguments("--remote-allow-origins=*"); // Allow any origin
+            options.setExperimentalOption("detach", false);
+            options.addArguments("--headless");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--remote-allow-origins=*");
             options.addArguments("--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.6998.89 Safari/537.36");
-
-            // Ignore the CDP version warnings - this is key
             System.setProperty("webdriver.chrome.silentOutput", "true");
             java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 
             LOGGER.info("Initializing ChromeDriver");
             driver = new ChromeDriver(options);
-
-
-
-
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-            // Open the page
             LOGGER.info("Opening URL: " + url);
             driver.get(url);
+            Thread.sleep(3000);
 
-            // Wait for page to load
-            Thread.sleep(3000); // Give the page a moment to load fully
-
-            // Take screenshot for debugging (optional)
-            // File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-            // Files.copy(screenshot.toPath(), Paths.get(directoryPath, "screenshot_" + timestamp + ".png"));
-
-            // Get the page source and parse with Jsoup
             LOGGER.info("Retrieving page source");
             String pageSource = driver.getPageSource();
             Document doc = Jsoup.parse(pageSource);
 
-            // Enhanced debugging
             LOGGER.info("Document title: " + doc.title());
             LOGGER.info("Total tables found: " + doc.select("table").size());
             LOGGER.info("Page contains 'Contract Name': " + doc.text().contains("Contract Name"));
             LOGGER.info("Page contains 'Calls': " + doc.text().contains("Calls"));
 
-            // Try multiple strategies to find the options table
             Element callsTable = null;
-
-            // Strategy 1: Find by section data attribute
             Element optionsSection = doc.selectFirst("section[data-test='options-section']");
             if (optionsSection != null) {
                 LOGGER.info("Found options section with data-test attribute");
                 callsTable = optionsSection.select("table").first();
             }
 
-            // Strategy 2: Find by specific table class or pattern
             if (callsTable == null) {
                 LOGGER.info("Trying to find table by class patterns");
                 callsTable = doc.select("table.calls, div.calls table, div[data-test='calls'] table").first();
             }
 
-            // Strategy 3: Find by examining table content
             if (callsTable == null) {
                 LOGGER.info("Examining all tables for calls content");
                 Elements tables = doc.select("table");
@@ -130,8 +99,8 @@ public class YahooFinanceOptionsChainScraper {
                     String tableText = table.text();
                     LOGGER.info("Table text: " + tableText.substring(0, Math.min(tableText.length(), 100)) + "...");
                     if (tableText.contains("Contract Name") ||
-                        tableText.contains("Call") ||
-                        tableText.contains("Strike") && tableText.contains("Volume")) {
+                            tableText.contains("Call") ||
+                            tableText.contains("Strike") && tableText.contains("Volume")) {
                         callsTable = table;
                         LOGGER.info("Found potential calls table by content");
                         break;
@@ -139,7 +108,6 @@ public class YahooFinanceOptionsChainScraper {
                 }
             }
 
-            // Strategy 4: Just take the first table if all else fails
             if (callsTable == null && !doc.select("table").isEmpty()) {
                 LOGGER.warning("Using fallback: selecting first table found");
                 callsTable = doc.select("table").first();
@@ -147,22 +115,19 @@ public class YahooFinanceOptionsChainScraper {
 
             if (callsTable == null) {
                 LOGGER.severe("No tables found in the document. Check if page loaded correctly.");
-                // Try direct WebDriver element access as last resort
                 try {
                     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
                     WebElement tableElement = wait.until(ExpectedConditions.presenceOfElementLocated(
-                        By.cssSelector("table")
+                            By.cssSelector("table")
                     ));
                     if (tableElement != null) {
                         LOGGER.info("Found table directly via WebDriver");
-                        // Extract HTML from WebElement and parse with Jsoup
                         callsTable = Jsoup.parse(tableElement.getAttribute("outerHTML")).select("table").first();
                     }
                 } catch (Exception e) {
                     LOGGER.severe("Failed to find table via WebDriver: " + e.getMessage());
-                    // Save page source for debugging
                     Files.write(Paths.get(directoryPath, "page_source_" + timestamp + ".html"),
-                               pageSource.getBytes());
+                            pageSource.getBytes());
                     LOGGER.info("Page source saved for debugging");
                     return;
                 }
@@ -170,18 +135,15 @@ public class YahooFinanceOptionsChainScraper {
 
             if (callsTable == null) {
                 LOGGER.severe("Calls table not found after multiple attempts. Check the HTML structure.");
-                // Save page source for debugging
                 Files.write(Paths.get(directoryPath, "page_source_" + timestamp + ".html"),
-                           pageSource.getBytes());
+                        pageSource.getBytes());
                 LOGGER.info("Page source saved for debugging");
                 return;
             }
 
-            // Extract table headers
             List<String> headers = new ArrayList<>();
             Elements headerRows = callsTable.select("thead tr");
             if (headerRows.isEmpty()) {
-                // Try to find headers in first row if thead is missing
                 Element firstRow = callsTable.select("tr").first();
                 if (firstRow != null) {
                     Elements headerCells = firstRow.select("th, td");
@@ -200,7 +162,6 @@ public class YahooFinanceOptionsChainScraper {
 
             if (headers.isEmpty()) {
                 LOGGER.warning("No headers found in table. Using default headers.");
-                // Add default headers
                 headers.add("Contract Name");
                 headers.add("Last Trade Date");
                 headers.add("Strike");
@@ -213,11 +174,9 @@ public class YahooFinanceOptionsChainScraper {
                 headers.add("Open Interest");
             }
 
-            // Extract table rows
             List<String[]> dataRows = new ArrayList<>();
             Elements bodyRows;
             if (callsTable.select("tbody").isEmpty()) {
-                // If no tbody, get all rows except first (which is headers)
                 Elements allRows = callsTable.select("tr");
                 bodyRows = new Elements();
                 for (int i = 1; i < allRows.size(); i++) {
@@ -230,7 +189,6 @@ public class YahooFinanceOptionsChainScraper {
             for (Element row : bodyRows) {
                 Elements cells = row.select("td");
                 if (cells.isEmpty()) {
-                    // Try to get any cell if td is not used
                     cells = row.select("td, th");
                 }
 
@@ -243,7 +201,6 @@ public class YahooFinanceOptionsChainScraper {
                 }
             }
 
-            // Write to CSV file
             LOGGER.info("Saving CSV file to: " + csvFilePath);
 
             try (CSVWriter writer = new CSVWriter(new FileWriter(csvFilePath))) {
@@ -269,23 +226,18 @@ public class YahooFinanceOptionsChainScraper {
         } finally {
             if (driver != null) {
                 try {
-
                     LOGGER.info("Closing WebDriver");
-                    driver.close();  // Close driver
+                    driver.close();
                     LOGGER.info("Closed WebDriver");
 
-
                     LOGGER.info("Sleep for 1000 millis");
-                    Thread.sleep(1000);  // Give some time before quitting
-                    LOGGER.info("Done sleeping");
-
+                    Thread.sleep(1000);
 
                     LOGGER.info("Quitting WebDriver");
-                    driver.quit();  // Quit driver
-                    Thread.sleep(3000); // Allow time for cleanup
+                    driver.quit();
+                    Thread.sleep(3000);
                     LOGGER.info("Done quitting");
 
-                    // Forcefully stop all remaining Selenium threads
                     LOGGER.info("Forcefully stopping lingering threads");
                     System.exit(0);
 

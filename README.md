@@ -1,5 +1,8 @@
 # options_market_data
 
+
+[![Coverage Status](https://coveralls.io/repos/github/timxor/options_market_data/badge.svg?branch=main)](https://coveralls.io/github/timxor/options_market_data?branch=main)
+
 options_market_data
 
 

@@ -1,0 +1,32 @@
+name: Java CI with Maven and Coveralls
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # Or your project's Java version
+          distribution: 'temurin'
+
+      - name: Build with Maven and Generate JaCoCo Report
+        run: mvn -B verify --file pom.xml # 'verify' includes the 'test' phase
+
+      - name: Upload coverage reports to Coveralls
+        uses: coverallsapp/github-action@v2 # Use the official Coveralls GitHub Action
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }} # GITHUB_TOKEN is automatically available
+          # For Maven, if JaCoCo XML report is not in the default location:
+          # path-to-lcov: target/site/jacoco/jacoco.xml
+          # For Gradle, the path is typically:
+          # path-to-lcov: build/reports/jacoco/test/jacocoTestReport.xml
+          # The action often auto-detects JaCoCo XML, but you can specify if needed.
+          # You might not need COVERALLS_REPO_TOKEN if using github-token for public repos
+          # but it's good practice for private repos or if explicitly required.
+          # coveralls-repo-token: ${{ secrets.COVERALLS_REPO_TOKEN }} # Uncomment if needed
