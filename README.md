@@ -4,6 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/timxor/options_market_data/badge.svg?branch=main)](https://coveralls.io/github/timxor/options_market_data?branch=main)
 
 options_market_data
+For a brief overview of the repository structure see [docs/overview.md](docs/overview.md).
+
 
 
 ## Quick Start
